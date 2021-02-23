@@ -18,8 +18,8 @@ use libra::prelude::*;
 use lang::compiler::bech32::{bech32_into_libra, HRP};
 use libra::rv;
 
-#[cfg(not(feature = "ps_address"))]
-use net::{get_resource, client::DnodeRestClient as NodeClient};
+#[cfg(any(feature = "dfinance_address", feature = "libra_address"))]
+use dnclient::blocking::{get_resource, client::DnodeRestClient as NodeClient};
 #[cfg(feature = "ps_address")]
 mod sp_client;
 #[cfg(feature = "ps_address")]
