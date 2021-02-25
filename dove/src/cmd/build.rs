@@ -46,30 +46,27 @@ impl TryFrom<Vec<CompiledUnit>> for Modules {
     type Error = Error;
 
     fn try_from(modules: Vec<CompiledUnit>) -> Result<Self, Self::Error> {
-        let modules = modules.into_iter()
-            .filter_map(|module| {
-                match &module {
-                    CompiledUnit::Module { ident, .. } => {
-                        let ident = &ident.0.value;
-                        let address = AccountAddress::new(ident.address.to_u8());
+        let modules = modules
+            .into_iter()
+            .filter_map(|module| match &module {
+                CompiledUnit::Module { ident, .. } => {
+                    let ident = &ident.0.value;
+                    let address = AccountAddress::new(ident.address.to_u8());
 
-                        Some(Identifier::new(ident.name.0.value.as_str())
+                    Some(
+                        Identifier::new(ident.name.0.value.as_str())
                             .map(|ident| AccessPath::from(&ModuleId::new(address, ident)))
-                            .and_then(|path| {
-                                Ok(Module {
-                                    address: path.address,
-                                    access_vector: hex::encode(path.path),
-                                    bytecode: hex::encode(module.serialize()),
-                                })
-                            }))
-                    }
-                    CompiledUnit::Script { .. } => { None }
+                            .map(|path| Module {
+                                address: path.address,
+                                access_vector: hex::encode(path.path),
+                                bytecode: hex::encode(module.serialize()),
+                            }),
+                    )
                 }
+                CompiledUnit::Script { .. } => None,
             })
             .collect::<Result<Vec<_>, _>>()?;
-        Ok(Modules {
-            modules
-        })
+        Ok(Modules { modules })
     }
 }
 
