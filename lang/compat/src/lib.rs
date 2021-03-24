@@ -17,7 +17,7 @@ mod mutator;
 pub const BASIS_LENGTH: usize = 32;
 
 pub enum SourceType {
-    Dfninance = 20,
+    Dfinance = 20,
     Diem = 16,
 }
 

@@ -1622,17 +1622,16 @@ name = "disassembler"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "bcs 0.1.2",
+ "bcs 0.1.1",
  "clap 3.0.0-beta.2",
- "diem-types",
  "git-hash",
  "hex",
  "itertools 0.9.0",
  "lang",
  "move-compat",
- "move-core-types 0.1.0 (git+https://github.com/dfinance/libra.git?branch=release-1.1.4)",
+ "move-core-types 0.1.0 (git+https://github.com/pontem-network/sp-move-vm.git?branch=compiler)",
  "rand 0.7.3",
- "vm 0.1.0 (git+https://github.com/dfinance/libra.git?branch=release-1.1.4)",
+ "vm 0.1.0 (git+https://github.com/pontem-network/sp-move-vm.git?branch=compiler)",
  "wasm-bindgen",
 ]
 

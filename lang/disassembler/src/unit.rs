@@ -23,7 +23,7 @@ impl CompiledUnit {
     /// Create a new CompiledUnit with the given bytecode.
     pub fn new(bytecode: &[u8]) -> Result<CompiledUnit, Error> {
         CompiledScript::deserialize(bytecode)
-            .map_err(|err| err.finish(Location::Undefined).into_vm_status().into())
+            .map_err(|err| Error::msg(err.finish(Location::Undefined)))
             .and_then(|s| {
                 if CompiledUnit::check_is_script(&s) {
                     Ok(CompiledUnit::Script(s))
@@ -41,7 +41,7 @@ impl CompiledUnit {
     fn load_as_module(bytecode: &[u8]) -> Result<CompiledUnit, Error> {
         Ok(CompiledUnit::Module(
             CompiledModule::deserialize(bytecode)
-                .map_err(|err| err.finish(Location::Undefined).into_vm_status())?,
+                .map_err(|err| Error::msg(err.finish(Location::Undefined)))?,
         ))
     }
 }

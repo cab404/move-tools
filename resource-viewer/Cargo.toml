@@ -52,19 +52,16 @@ default = [
 diem_address = [
     "lang/diem_address",
     "diem/diem_address",
-    "compat/diem_address",
     "dnclient",
 ]
 dfinance_address = [
     "lang/dfinance_address",
     "diem/dfinance_address",
-    "compat/dfinance_address",
     "dnclient",
 ]
 ps_address = [
     "lang/ps_address",
     "diem/ps_address",
-    "compat/ps_address",
     "substrate-api-client",
     "keyring",
     "sp-core",

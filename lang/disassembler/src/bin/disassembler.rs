@@ -1,10 +1,13 @@
 extern crate clap;
 
-use std::fs::{File, canonicalize, read};
-use std::path::PathBuf;
+use std::fs::{canonicalize, File, read};
 use std::io::Write;
+use std::path::PathBuf;
+
 use anyhow::Error;
 use clap::Clap;
+
+use compat::{adapt_to_basis, SourceType};
 
 #[derive(Clap, Debug)]
 #[clap(name = "Move decompiler", version = disassembler::VERSION)]
@@ -18,8 +21,13 @@ struct Opt {
     /// Prints results to stdout by default.
     output: Option<PathBuf>,
 
-    #[clap(about = "Enables compatibility mode", long, short)]
-    compat: bool,
+    #[clap(
+        about = "Enables compatibility mode",
+        long,
+        short,
+        default_value = "pont"
+    )]
+    dialect: String,
 }
 
 fn main() {
@@ -34,9 +42,11 @@ fn run() -> Result<(), Error> {
     let input = canonicalize(opts.input)?;
     let mut bytes = read(input)?;
 
-    if opts.compat {
-        compat::adapt(&mut bytes)?;
-    }
+    match opts.dialect.as_str() {
+        "diem" => adapt_to_basis(&mut bytes, SourceType::Diem)?,
+        "dfinance" => adapt_to_basis(&mut bytes, SourceType::Dfinance)?,
+        _ => { /*no-op*/ }
+    };
 
     let cfg = disassembler::Config {
         light_version: false,
