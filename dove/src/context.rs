@@ -59,7 +59,7 @@ impl Context {
             .clone()
             .ok_or_else(|| anyhow!("couldn't read account address from manifest"))?;
 
-        self.dialect.normalize_account_address(&acc_addr)
+        self.dialect.parse_address(&acc_addr)
     }
 }
 

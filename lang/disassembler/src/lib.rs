@@ -148,7 +148,7 @@ mod tests {
         let _pool = ConstPool::new();
         let dialect = DialectName::DFinance.get_dialect();
 
-        let sender = dialect.normalize_account_address("0x1").unwrap();
+        let sender = dialect.parse_address("0x1").unwrap();
         let deps = &[
             MoveFile::with_content("assets/base.move", include_str!("assets/base.move")),
             MoveFile::with_content("assets/tx.move", include_str!("assets/tx.move")),

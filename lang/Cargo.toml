@@ -10,9 +10,10 @@ edition = "2018"
 publish = false
 
 [dependencies]
-diem = { package = "dfibra", git = "https://github.com/dfinance/libra.git", branch = "release-1.1.4" }
-diem-move-core-types = { package = "move-core-types", git = "https://github.com/dfinance/libra.git", branch = "master" }
-
+vm = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler", default-features = false }
+mvm = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler", default-features = false }
+move-core-types = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler", default-features = false}
+move-vm-types = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler", default-features = false}
 disassembler = { path = "disassembler", default-features = false }
 compat = { path = "compat", package = "move-compat" }
 
@@ -48,11 +49,8 @@ include_dir = "0.6.0"
 
 [features]
 diem_address = [
-    "diem/diem_address",
 ]
 dfinance_address = [
-    "diem/dfinance_address",
 ]
 ps_address = [
-    "diem/ps_address",
 ]

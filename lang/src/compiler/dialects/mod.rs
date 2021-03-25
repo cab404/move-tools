@@ -1,25 +1,28 @@
-pub mod dfinance;
-pub mod libra;
-pub mod line_endings;
-pub mod polkadot;
+use std::str::FromStr;
 
 use anyhow::Result;
-use ::diem::move_core_types::gas_schedule::CostTable;
+use move_core_types::account_address::AccountAddress;
+use move_core_types::gas_schedule::CostTable;
 use crate::compiler::source_map::FileOffsetMap;
-use std::str::FromStr;
-use crate::compiler::dialects::libra::LibraDialect;
-use crate::compiler::dialects::dfinance::DFinanceDialect;
-use crate::compiler::dialects::polkadot::PolkadotDialect;
-use crate::compiler::address::ProvidedAccountAddress;
+use std::borrow::Cow;
+use std::fmt::Debug;
+use crate::compiler::dialects::diem::Diem;
+use crate::compiler::dialects::dfinance::DFinance;
+use crate::compiler::dialects::pontem::Pontem;
 
-pub trait Dialect {
+pub mod dfinance;
+pub mod diem;
+pub mod line_endings;
+pub mod pontem;
+
+pub trait Dialect: Debug {
     fn name(&self) -> &str;
 
-    fn normalize_account_address(&self, addr: &str) -> Result<ProvidedAccountAddress>;
+    fn parse_address(&self, addr: &str) -> Result<AccountAddress>;
 
     fn cost_table(&self) -> CostTable;
 
-    fn replace_addresses(&self, source_text: &str, source_map: &mut FileOffsetMap) -> String;
+    fn replace_addresses<'src>(&self, source_text: &'src str, source_map: &mut FileOffsetMap) -> Cow<'src, str>;
 }
 
 #[derive(serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -27,15 +30,15 @@ pub trait Dialect {
 pub enum DialectName {
     Libra,
     DFinance,
-    Polkadot,
+    Pontem,
 }
 
 impl DialectName {
     pub fn get_dialect(&self) -> Box<dyn Dialect> {
         match self {
-            DialectName::Libra => Box::new(LibraDialect::default()),
-            DialectName::DFinance => Box::new(DFinanceDialect::default()),
-            DialectName::Polkadot => Box::new(PolkadotDialect::default()),
+            DialectName::Libra => Box::new(Diem::default()),
+            DialectName::DFinance => Box::new(DFinance::default()),
+            DialectName::Pontem => Box::new(Pontem::default()),
         }
     }
 }
@@ -47,7 +50,7 @@ impl FromStr for DialectName {
         match s {
             "libra" => Ok(DialectName::Libra),
             "dfinance" => Ok(DialectName::DFinance),
-            "polkadot" => Ok(DialectName::Polkadot),
+            "pontem" => Ok(DialectName::Pontem),
             _ => Err(anyhow::format_err!("Invalid dialect {:?}", s)),
         }
     }

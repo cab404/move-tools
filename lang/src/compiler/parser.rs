@@ -117,7 +117,7 @@ fn normalize_source_text(
             &mut file_source_map,
         );
     }
-    source_text = dialect.replace_addresses(&source_text, &mut file_source_map);
+    source_text = dialect.replace_addresses(&source_text, &mut file_source_map).into_owned();
     (source_text, file_source_map)
 }
 

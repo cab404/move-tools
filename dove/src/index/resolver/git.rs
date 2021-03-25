@@ -135,7 +135,7 @@ fn get_dep_address(path: &Path) -> Result<Option<AccountAddress>, Error> {
             .account_address
             .ok_or_else(|| anyhow!("couldn't read account address from manifest"))?;
 
-        let provided_account_address = dialect.normalize_account_address(&acc_addr)?;
+        let provided_account_address = dialect.parse_address(&acc_addr)?;
 
         Ok(Some(provided_account_address.as_account_address()))
     } else {

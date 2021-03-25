@@ -1,39 +1,31 @@
 use crate::compiler::dialects::Dialect;
 use crate::compiler::source_map::FileOffsetMap;
 use anyhow::Context;
-use diem::move_core_types::account_address::AccountAddress;
 use anyhow::Result;
-use diem::move_core_types::gas_schedule::{CostTable, GasCost};
-use diem::move_vm_types::gas_schedule::new_from_instructions;
-use diem::move_vm_types::gas_schedule::NativeCostIndex as N;
-use diem::vm::{
-    file_format::{
-        ConstantPoolIndex, FieldHandleIndex, FieldInstantiationIndex, FunctionHandleIndex,
-        FunctionInstantiationIndex, StructDefInstantiationIndex, StructDefinitionIndex,
-    },
-    file_format_common::instruction_key,
-};
-use crate::compiler::address::ProvidedAccountAddress;
 use crate::compiler::bech32::{bech32_into_libra, HRP, replace_bech32_addresses};
+use move_core_types::gas_schedule::{CostTable, GasCost};
+use move_vm_types::gas_schedule::NativeCostIndex as N;
+use vm::file_format::{StructDefinitionIndex, StructDefInstantiationIndex, ConstantPoolIndex, FunctionHandleIndex, FunctionInstantiationIndex, FieldInstantiationIndex, FieldHandleIndex};
+use vm::file_format_common::instruction_key;
+use move_core_types::account_address::AccountAddress;
+use move_vm_types::gas_schedule::new_from_instructions;
+use std::borrow::Cow;
 
-#[derive(Default)]
-pub struct DFinanceDialect;
+#[derive(Default, Debug)]
+pub struct DFinance;
 
-impl Dialect for DFinanceDialect {
+impl Dialect for DFinance {
     fn name(&self) -> &str {
         "dfinance"
     }
 
-    fn normalize_account_address(&self, addr: &str) -> Result<ProvidedAccountAddress> {
+    fn parse_address(&self, addr: &str) -> Result<AccountAddress> {
         let address_res = if addr.starts_with(HRP) {
-            bech32_into_libra(addr).map(|lowered_addr| {
-                ProvidedAccountAddress::new(addr.to_string(), addr.to_string(), lowered_addr)
+            bech32_into_libra(addr).and_then(|lowered_addr| {
+                AccountAddress::from_hex_literal(&lowered_addr)
             })
         } else if addr.starts_with("0x") {
-            AccountAddress::from_hex_literal(addr).map(|address| {
-                let lowered_addr = format!("0x{}", address);
-                ProvidedAccountAddress::new(addr.to_string(), lowered_addr.clone(), lowered_addr)
-            })
+            AccountAddress::from_hex_literal(addr)
         } else {
             Err(anyhow::anyhow!("Does not start with either wallet1 or 0x"))
         };
@@ -41,16 +33,16 @@ impl Dialect for DFinanceDialect {
     }
 
     fn cost_table(&self) -> CostTable {
-        dfinance_cost_table()
+        cost_table()
     }
 
-    fn replace_addresses(&self, source_text: &str, source_map: &mut FileOffsetMap) -> String {
-        replace_bech32_addresses(&source_text, source_map)
+    fn replace_addresses<'src>(&self, source_text: &'src str, source_map: &mut FileOffsetMap) -> Cow<'src, str> {
+        Cow::Owned(replace_bech32_addresses(&source_text, source_map))
     }
 }
 
-pub fn dfinance_cost_table() -> CostTable {
-    use diem::vm::file_format::Bytecode::*;
+fn cost_table() -> CostTable {
+    use vm::file_format::Bytecode::*;
 
     let mut instrs = vec![
         (MoveTo(StructDefinitionIndex::new(0)), GasCost::new(825, 1)),
@@ -203,3 +195,4 @@ pub fn dfinance_cost_table() -> CostTable {
 
     new_from_instructions(instrs, raw_native_table)
 }
+
