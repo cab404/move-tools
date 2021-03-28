@@ -1,12 +1,13 @@
 use crate::compiler::{CompileFlow, Step, compile};
 use anyhow::Error;
 use crate::compiler::parser::{ParserArtifact, ParsingMeta};
-use diem::module::{CompiledUnit, Definition};
-use diem::move_lang::errors::Errors;
+use move_lang::errors::Errors;
 use crate::compiler::error::CompilerError;
 use crate::compiler::dialects::Dialect;
 use crate::compiler::file::MoveFile;
-use diem::move_lang::parser::ast::{Script, Type, Type_, ModuleAccess_};
+use move_lang::parser::ast::{Script, Type, Type_, ModuleAccess_};
+use move_lang::parser::ast::Definition;
+use move_lang::compiled_unit::CompiledUnit;
 
 pub struct ScriptMetadata;
 
