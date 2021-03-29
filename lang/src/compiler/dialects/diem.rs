@@ -6,7 +6,10 @@ use move_core_types::gas_schedule::{CostTable, GasCost};
 use move_vm_types::gas_schedule::NativeCostIndex as N;
 use crate::compiler::dialects::Dialect;
 use crate::compiler::source_map::FileOffsetMap;
-use vm::file_format::{StructDefinitionIndex, StructDefInstantiationIndex, FieldHandleIndex, ConstantPoolIndex, FieldInstantiationIndex, FunctionInstantiationIndex, FunctionHandleIndex};
+use vm::file_format::{
+    StructDefinitionIndex, StructDefInstantiationIndex, FieldHandleIndex, ConstantPoolIndex,
+    FieldInstantiationIndex, FunctionInstantiationIndex, FunctionHandleIndex,
+};
 use vm::file_format_common::instruction_key;
 use move_vm_types::gas_schedule;
 
@@ -26,7 +29,11 @@ impl Dialect for Diem {
         cost_table()
     }
 
-    fn replace_addresses<'src>(&self, source_text: &'src str, _: &mut FileOffsetMap) -> Cow<'src, str> {
+    fn replace_addresses<'src>(
+        &self,
+        source_text: &'src str,
+        _: &mut FileOffsetMap,
+    ) -> Cow<'src, str> {
         // no-op
         Cow::Borrowed(source_text)
     }

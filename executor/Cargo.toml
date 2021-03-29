@@ -1,7 +1,11 @@
 [package]
 name = "move-executor"
 version = "0.1.0"
-authors = ["Maksim Kurnikov <maxim.kurnikov@gmail.com>"]
+authors = [
+    "Alex Koz. <alexanderkozlovskii@wings.ai>",
+    "Dm. Yakushev <dmitryyakushev@wings.ai>",
+    "Maxim Kurnikov <maximkurnikov@wings.ai>"
+]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -15,18 +19,14 @@ textwrap = "0.12.1"
 num-format = { version = "0.4", features = ["std"] }
 enum-iterator = "0.6.0"
 
-diem = { package = "dfibra", git = "https://github.com/dfinance/libra.git", branch = "release-1.1.4" }
+bcs = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler" }
+move-ir-types = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler" }
+move-vm-runtime = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler" }
+move-vm-types = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler" }
+move-lang = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler" }
+vm = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler" }
+move-core-types = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler" }
+
 resources = { path = "../resources" }
 lang = { path = "../lang" }
 git-hash = { path = "../common/git-hash" }
-
-[features]
-diem_address = [
-    "diem/diem_address"
-]
-dfinance_address = [
-    "diem/dfinance_address"
-]
-ps_address = [
-    "diem/ps_address"
-]

@@ -44,18 +44,15 @@ default = [
 diem_address = [
     "diem/diem_address",
     "lang/diem_address",
-    "move-executor/diem_address",
     "move-resource-viewer/diem_address",
 ]
 dfinance_address = [
     "diem/dfinance_address",
     "lang/dfinance_address",
-    "move-executor/dfinance_address",
     "move-resource-viewer/dfinance_address",
 ]
 ps_address = [
     "diem/ps_address",
     "lang/ps_address",
-    "move-executor/ps_address",
     "move-resource-viewer/ps_address"
 ]

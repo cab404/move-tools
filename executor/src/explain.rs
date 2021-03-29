@@ -1,18 +1,18 @@
 use anyhow::Result;
 use std::fmt::Write;
 
-use diem::move_vm_runtime::data_cache::TransactionEffects;
+use move_vm_runtime::data_cache::TransactionEffects;
 use crate::execution::FakeRemoteCache;
-use diem::diem_types::vm_status::{VMStatus, AbortLocation, StatusCode};
-use diem::vm::file_format::CompiledScript;
-use diem::move_core_types::account_address::AccountAddress;
-use diem::move_core_types::transaction_argument::TransactionArgument;
-use diem::vm::access::ScriptAccess;
-use diem::move_core_types::language_storage::{StructTag, TypeTag};
-use diem::move_vm_types::values::{ValueImpl, Container};
+use move_core_types::vm_status::{VMStatus, AbortLocation, StatusCode};
+use vm::file_format::CompiledScript;
+use move_core_types::account_address::AccountAddress;
+use move_core_types::transaction_argument::TransactionArgument;
+use vm::access::ScriptAccess;
+use move_core_types::language_storage::{StructTag, TypeTag};
+use move_vm_types::values::{ValueImpl, Container};
 use num_format::ToFormattedString;
 use crate::session::ConstsMap;
-use diem::move_lang::shared::Address;
+use move_lang::shared::Address;
 
 pub type StepResultInfo = (String, u64, usize, StepExecutionResult);
 
@@ -230,7 +230,7 @@ pub fn explain_effects(
 
     let mut explained_effects = ExplainedTransactionEffects::default();
     if !effects.events.is_empty() {
-        for (_, _, ty, _, event_data, _) in &effects.events {
+        for (_, ty, _, event_data, _) in &effects.events {
             let formatted_ty = format_type_tag(ty)?;
             explained_effects.events.push(ResourceChange(
                 formatted_ty,
@@ -277,7 +277,7 @@ pub fn explain_type_error(
     signers: &[AccountAddress],
     txn_args: &[TransactionArgument],
 ) -> String {
-    use diem::vm::file_format::SignatureToken::*;
+    use vm::file_format::SignatureToken::*;
 
     let script_params = script.signature_at(script.as_inner().parameters);
     let expected_num_signers = script_params

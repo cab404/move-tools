@@ -10,12 +10,12 @@ edition = "2018"
 publish = false
 
 [dependencies]
-vm = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler", default-features = false }
-mvm = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler", default-features = false }
-move-core-types = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler", default-features = false }
-move-vm-types = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler", default-features = false }
-move-lang = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler", default-features = false }
-move-ir-types = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler", default-features = false }
+vm = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler" }
+mvm = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler" }
+move-core-types = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler" }
+move-vm-types = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler" }
+move-lang = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler" }
+move-ir-types = { git = "https://github.com/pontem-network/sp-move-vm.git", branch = "compiler" }
 disassembler = { path = "disassembler", default-features = false }
 compat = { path = "compat", package = "move-compat" }
 

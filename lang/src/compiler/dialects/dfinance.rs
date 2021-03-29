@@ -5,7 +5,10 @@ use anyhow::Result;
 use crate::compiler::bech32::{bech32_into_libra, HRP, replace_bech32_addresses};
 use move_core_types::gas_schedule::{CostTable, GasCost};
 use move_vm_types::gas_schedule::NativeCostIndex as N;
-use vm::file_format::{StructDefinitionIndex, StructDefInstantiationIndex, ConstantPoolIndex, FunctionHandleIndex, FunctionInstantiationIndex, FieldInstantiationIndex, FieldHandleIndex};
+use vm::file_format::{
+    StructDefinitionIndex, StructDefInstantiationIndex, ConstantPoolIndex, FunctionHandleIndex,
+    FunctionInstantiationIndex, FieldInstantiationIndex, FieldHandleIndex,
+};
 use vm::file_format_common::instruction_key;
 use move_core_types::account_address::AccountAddress;
 use move_vm_types::gas_schedule::new_from_instructions;
@@ -21,9 +24,8 @@ impl Dialect for DFinance {
 
     fn parse_address(&self, addr: &str) -> Result<AccountAddress> {
         let address_res = if addr.starts_with(HRP) {
-            bech32_into_libra(addr).and_then(|lowered_addr| {
-                AccountAddress::from_hex_literal(&lowered_addr)
-            })
+            bech32_into_libra(addr)
+                .and_then(|lowered_addr| AccountAddress::from_hex_literal(&lowered_addr))
         } else if addr.starts_with("0x") {
             AccountAddress::from_hex_literal(addr)
         } else {
@@ -36,7 +38,11 @@ impl Dialect for DFinance {
         cost_table()
     }
 
-    fn replace_addresses<'src>(&self, source_text: &'src str, source_map: &mut FileOffsetMap) -> Cow<'src, str> {
+    fn replace_addresses<'src>(
+        &self,
+        source_text: &'src str,
+        source_map: &mut FileOffsetMap,
+    ) -> Cow<'src, str> {
         Cow::Owned(replace_bech32_addresses(&source_text, source_map))
     }
 }
@@ -195,4 +201,3 @@ fn cost_table() -> CostTable {
 
     new_from_instructions(instrs, raw_native_table)
 }
-

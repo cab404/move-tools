@@ -22,7 +22,11 @@ pub trait Dialect: Debug {
 
     fn cost_table(&self) -> CostTable;
 
-    fn replace_addresses<'src>(&self, source_text: &'src str, source_map: &mut FileOffsetMap) -> Cow<'src, str>;
+    fn replace_addresses<'src>(
+        &self,
+        source_text: &'src str,
+        source_map: &mut FileOffsetMap,
+    ) -> Cow<'src, str>;
 }
 
 #[derive(serde::Deserialize, Debug, Clone, PartialEq, Eq)]

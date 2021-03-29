@@ -34,7 +34,11 @@ impl Dialect for Pontem {
         cost_table()
     }
 
-    fn replace_addresses<'src>(&self, source_text: &'src str, source_map: &mut FileOffsetMap) -> Cow<'src, str> {
+    fn replace_addresses<'src>(
+        &self,
+        source_text: &'src str,
+        source_map: &mut FileOffsetMap,
+    ) -> Cow<'src, str> {
         Cow::Owned(replace_ss58_addresses(&source_text, source_map))
     }
 }

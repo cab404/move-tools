@@ -6,10 +6,11 @@ pub use move_lang::name_pool::ConstPool;
 
 use parser::parse_program;
 
-use crate::compiler::address::ProvidedAccountAddress;
 use crate::compiler::dialects::Dialect;
 use crate::compiler::file::MoveFile;
 use crate::compiler::parser::{ParserArtifact, ParsingMeta};
+use move_core_types::account_address::AccountAddress;
+use move_lang::shared::Address;
 
 pub mod address;
 pub mod bech32;
@@ -24,7 +25,7 @@ pub mod ss58;
 pub type CheckerResult = Result<cfgir::ast::Program, Errors>;
 
 pub trait CompileFlow<A> {
-    fn init(&mut self, _dialect: &dyn Dialect, _sender: &Option<&ProvidedAccountAddress>) {}
+    fn init(&mut self, _dialect: &dyn Dialect, _sender: &Option<&AccountAddress>) {}
     fn after_parsing(&mut self, parser_artifact: ParserArtifact) -> Step<A, ParserArtifact> {
         Step::Next(parser_artifact)
     }
@@ -51,7 +52,7 @@ pub fn compile<A>(
     dialect: &dyn Dialect,
     targets: &[MoveFile],
     deps: &[MoveFile],
-    sender: Option<&ProvidedAccountAddress>,
+    sender: Option<&AccountAddress>,
     mut flow: impl CompileFlow<A>,
 ) -> A {
     flow.init(dialect, &sender);
@@ -64,7 +65,7 @@ pub fn compile<A>(
         result: pprog_res,
     } = parser_result;
 
-    let sender = sender.map(|addr| addr.as_address());
+    let sender = sender.map(|addr| Address::from(*addr));
 
     let check_result = pprog_res
         .and_then(|pprog| move_continue_up_to(PassResult::Parser(sender, pprog), Pass::CFGIR))
