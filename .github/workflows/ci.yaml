@@ -19,9 +19,9 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-latest
-          - ubuntu-latest
-          # TODO: - windows-latest
+          #- macos-latest
+          #- ubuntu-latest
+          - windows-latest
 
     env:
       RUSTFLAGS: -D warnings
