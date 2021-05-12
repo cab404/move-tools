@@ -1,7 +1,10 @@
 name: Build Release Tools
 on:
-  # push: # STOPSHIP
-  pull_request:  # STOPSHIP
+   # STOPSHIP
+  # pull_request:
+  # push:
+  #   branches:
+  #     - master
 
   workflow_run:
     workflows: [Create Release Page]
@@ -34,66 +37,104 @@ jobs:
       upload_url: ${{ steps.release.outputs.upload_url }}
 
   build:
-    name: Build ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.bin }}-${{ matrix.platform.name }}
+    runs-on: ${{ matrix.platform.os }}
     needs: release
-    env: ${{ matrix.env }}
 
     strategy:
       fail-fast: false
       matrix:
-        bin:
-          - { crate: disassembler,          ignore-on: [  ]       }
-          - { crate: dove,                  ignore-on: [  ]       }
-          - { crate: executor,              ignore-on: [  ]       }
-          - { crate: move-language-server,  ignore-on: [  ]       }
-          - { crate: move-resource-viewer,  ignore-on: [ win ]    }
-          - { crate: testrunner,            ignore-on: [ win ]    }
-        include:
-          - platform: darwin
+        target:
+          - artifact-name: move-disassembler
+            bin: disassembler
+            crate: disassembler
+
+          - artifact-name: dove
+            bin: dove
+            crate: dove
+            libs: openssl
+
+          - artifact-name: move-executor
+            bin: executor
+            crate: move-executor
+
+          - artifact-name: move-language-server
+            bin: move-language-server
+            crate: move-language-server
+
+          - artifact-name: move-resource-viewer
+            bin: move-resource-viewer
+            crate: move-resource-viewer
+
+          - artifact-name: move-testrunner
+            bin: testrunner
+            crate: move-executor
+
+        platform:
+          - name: darwin
             os: macos-latest
             triplet: x64-osx
-          - platform: linux
+            env: {}
+          - name: linux
             os: ubuntu-latest
             triplet: x64-linux
-          - os: windows-latest
+            env: {}
+          - name: win
+            os: windows-latest
             triplet: x64-windows-static-md
-            platform: win
-            env:
-              OS_BIN_EXT: .exe
+            suffix: .exe
+
+        exclude:
+          - { platform: { name: win }, target: { bin: move-resource-viewer } }
+          - { platform: { name: win }, target: { bin: testrunner } }
 
     defaults:
       run:
         shell: bash
 
-    if: ${{ !contains(matrix.bin.ignore-on, matrix.os) }}
-
     steps:
       - name: Checkout (${{ needs.release.outputs.tag }}-${{ github.event.workflow_run.head_sha }})
         uses: actions/checkout@v2
+        # with:
+        #   ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          toolchain: stable
+          profile: minimal
+          override: true
 
-      # - name: Install Rust toolchain
-      #   uses: actions-rs/toolchain@v1
-      #   with:
-      #     toolchain: stable
-      #     profile: minimal
-      #     override: true
+      - name: Restore from cache and run vcpkg
+        if: ${{ matrix.target.libs != null }}
+        uses: lukka/run-vcpkg@v7
+        with:
+          vcpkgArguments: ${{ matrix.target.libs }}
+          vcpkgDirectory: '${{github.workspace}}/3rdparty/vcpkg'
+          vcpkgTriplet: ${{ matrix.platform.triplet }}
+          vcpkgGitCommitId: "3b4dd085b0f5b410d9f587b3c9f7ad08a07449aa"
 
-      # - name: Build ${{ matrix.bin.crate }} on ${{ matrix.name }}
+      - name: Build ${{ matrix.target.bin }}
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --bin ${{ matrix.target.bin }} -p ${{ matrix.target.crate }}
 
-      # - name: Build all executables
-      #   if: matrix.os != 'windows-latest'
-      #   run: cargo build --release --all --bins
-      # - name: Build all executables
-      #   if: matrix.os == 'windows-latest'
-      #   run: >
-      #     cargo build --release --bins
-      #     -p=dove
-      #     -p=move-executor
-      #     -p=disassembler
-      #     -p=move-language-server
+      - id: version
+        name: get version
+        uses: ./.github/actions/crate-version
+        with:
+          crate: ${{ matrix.target.crate }}
+
+      - name: upload artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./target/release/${{ matrix.target.bin }}
+          asset_name: ${{ steps.archive.outputs.name }}-${{ steps.version.outputs.value }}-${{ matrix.platform.name }}${{ matrix.platform.suffix }}
+          asset_content_type: application/gzip
 
       # - id: mls
       #   name: get version of move-language-server
@@ -212,15 +253,15 @@ jobs:
       #     echo "::set-output name=testrunner_path::$RELEASE_DIR/$TESTRUNNER_NAME"
       #     echo "::set-output name=disassembler_path::$RELEASE_DIR/$DISASSEMBLER_NAME"
 
-      # - name: upload Toolchain
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ needs.release.outputs.upload_url }}
-      #     asset_path: ${{ steps.archive.outputs.path }}
-      #     asset_name: ${{ steps.archive.outputs.name }}
-      #     asset_content_type: application/gzip
+      - name: upload Toolchain
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ${{ steps.archive.outputs.path }}
+          asset_name: ${{ steps.archive.outputs.name }}
+          asset_content_type: application/gzip
 
       # - name: upload MLS
       #   uses: actions/upload-release-asset@v1
