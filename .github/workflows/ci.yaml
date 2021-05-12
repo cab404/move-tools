@@ -4,11 +4,12 @@ on:
   push:
     branches:
       - master
-if: false
 
 jobs:
   clippy:
-    name: Clippy tags
+    if: false # stopship
+
+    name: Clippy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,6 +21,7 @@ jobs:
   tests:
     name: Tests
     runs-on: ${{ matrix.os }}
+    if: false # stopship
 
     strategy:
       fail-fast: false
@@ -88,6 +90,8 @@ jobs:
   wasm:
     name: wasm
     runs-on: ubuntu-latest
+
+    if: false # stopship
 
     defaults:
       run:
