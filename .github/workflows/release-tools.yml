@@ -1,5 +1,6 @@
 name: Build Release Tools
 on:
+  push: # STOPSHIP
   workflow_run:
     workflows: [Create Release Page]
     types: [completed]
