@@ -1,9 +1,10 @@
 name: Tests
 on:
-  # pull_request:
-  # push:
-  #   branches:
-  #     - master
+  pull_request:
+  push:
+    branches:
+      - master
+if: false
 
 jobs:
   clippy:
